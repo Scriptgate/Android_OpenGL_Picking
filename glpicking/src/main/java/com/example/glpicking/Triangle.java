@@ -81,7 +81,7 @@ public class Triangle {
         // intersect point of ray and plane
         Point3D intersectionPoint = addition(R.P0, scalarProduct(r, dir));
 
-        // is I inside T?
+        // is the intersection point inside the triangle?
         float uu, uv, vv, wu, wv, D;
         uu = dot(u, u);
         uv = dot(u, v);
@@ -93,17 +93,17 @@ public class Triangle {
 
         // get and test parametric coords
         float s, t;
-        s = ((uv * wv) - (vv * wu)) / D;
+        s = (uv * wv - vv * wu) / D;
         if (s < 0.0f || s > 1.0f) {
-            // I is outside T
+            // intersection point is outside triangle
             return disjoint();
         }
         t = (uv * wu - uu * wv) / D;
         if (t < 0.0f || (s + t) > 1.0f) {
-            // I is outside T
+            // intersection point is outside triangle
             return disjoint();
         }
-        // I is in T
+        // intersection point is in triangle
         return intersect(intersectionPoint);
     }
 }
