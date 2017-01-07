@@ -1,6 +1,18 @@
 package com.example.glpicking;
 
+import com.example.glpicking.common.Intersection;
 import com.example.glpicking.common.Point3D;
+
+import static com.example.glpicking.common.Intersection.degenerate;
+import static com.example.glpicking.common.Intersection.disjoint;
+import static com.example.glpicking.common.Intersection.intersect;
+import static com.example.glpicking.common.Intersection.samePlane;
+import static com.example.glpicking.common.Point3D.addition;
+import static com.example.glpicking.common.Point3D.crossProduct;
+import static com.example.glpicking.common.Point3D.dot;
+import static com.example.glpicking.common.Point3D.minus;
+import static com.example.glpicking.common.Point3D.scalarProduct;
+import static java.lang.Math.abs;
 
 public class Triangle {
 
@@ -20,57 +32,63 @@ public class Triangle {
      * @param R a ray R
      * @param T a triangle T
      * @param I intersection point (when it exists)
-     * @return
-     * -1 = triangle is degenerate (a segment or point)<br/>
+     * @return -1 = triangle is degenerate (a segment or point)<br/>
      * 0 = disjoint (no intersect)<br/>
      * 1 = intersect in unique point I1<br/>
      * 2 = are in the same plane
      */
-    public static int intersectRayAndTriangle(Ray R, Triangle T, Point3D I) {
-        Point3D u, v, n;             // triangle vectors
-        Point3D dir, w0, w;          // ray vectors
-        float r, a, b;             // params to calc ray-plane intersect
+    public static Intersection intersectRayAndTriangle(Ray R, Triangle T) {
+        // triangle vectors
+        Point3D u, v, normal;
+        // ray vectors
+        Point3D dir, w0, w;
+        // params to calc ray-plane intersect
+        float r, a, b;
 
         // get triangle edge vectors and plane normal
-        u = Point3D.minus(T.V1, T.V0);
-        v = Point3D.minus(T.V2, T.V0);
-        n = Point3D.crossProduct(u, v);             // cross product
+        u = minus(T.V1, T.V0);
+        v = minus(T.V2, T.V0);
+        normal = crossProduct(u, v);
 
-        if (n.isZero()) {           // triangle is degenerate
-            return -1;                 // do not deal with this case
+        if (normal.isZero()) {
+            // triangle is degenerate, do not deal with this case
+            return degenerate();
         }
-        dir = Point3D.minus(R.P1, R.P0);             // ray direction vector
-        w0 = Point3D.minus(R.P0, T.V0);
-        a = -Point3D.dot(n, w0);
-        b = Point3D.dot(n, dir);
-        if (Math.abs(b) < SMALL_NUM) {     // ray is parallel to triangle plane
-            if (a == 0) {                // ray lies in triangle plane
-                return 2;
+        // ray direction vector
+        dir = minus(R.P1, R.P0);
+        w0 = minus(R.P0, T.V0);
+        a = -dot(normal, w0);
+        b = dot(normal, dir);
+        if (abs(b) < SMALL_NUM) {
+            // ray is parallel to triangle plane
+            if (a == 0) {
+                // ray lies in triangle plane
+                return samePlane();
             } else {
-                return 0;             // ray disjoint from plane
+                // ray disjoint from plane
+                return disjoint();
             }
         }
 
         // get intersect point of ray with triangle plane
         r = a / b;
-        if (r < 0.0f) {                   // ray goes away from triangle
-            return 0;                  // => no intersect
+        if (r < 0.0f) {
+            // ray goes away from triangle => no intersect
+            return disjoint();
         }
-        // for a segment, also test if (r > 1.0) => no intersect
+        //TODO: for a segment, also test if (r > 1.0) => no intersect
 
-        Point3D tempI = Point3D.addition(R.P0, Point3D.scalarProduct(r, dir));           // intersect point of ray and plane
-        I.x = tempI.x;
-        I.y = tempI.y;
-        I.z = tempI.z;
+        // intersect point of ray and plane
+        Point3D intersectionPoint = addition(R.P0, scalarProduct(r, dir));
 
         // is I inside T?
         float uu, uv, vv, wu, wv, D;
-        uu = Point3D.dot(u, u);
-        uv = Point3D.dot(u, v);
-        vv = Point3D.dot(v, v);
-        w = Point3D.minus(I, T.V0);
-        wu = Point3D.dot(w, u);
-        wv = Point3D.dot(w, v);
+        uu = dot(u, u);
+        uv = dot(u, v);
+        vv = dot(v, v);
+        w = minus(intersectionPoint, T.V0);
+        wu = dot(w, u);
+        wv = dot(w, v);
         D = (uv * uv) - (uu * vv);
 
         // get and test parametric coords
@@ -78,13 +96,14 @@ public class Triangle {
         s = ((uv * wv) - (vv * wu)) / D;
         if (s < 0.0f || s > 1.0f) {
             // I is outside T
-            return 0;
+            return disjoint();
         }
         t = (uv * wu - uu * wv) / D;
         if (t < 0.0f || (s + t) > 1.0f) {
             // I is outside T
-            return 0;
+            return disjoint();
         }
-        return 1;                      // I is in T
+        // I is in T
+        return intersect(intersectionPoint);
     }
 }

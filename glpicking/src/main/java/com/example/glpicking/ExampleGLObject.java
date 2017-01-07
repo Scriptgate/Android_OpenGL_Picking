@@ -14,6 +14,7 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.example.glpicking.common.Color;
+import com.example.glpicking.common.Intersection;
 import com.example.glpicking.common.Point3D;
 
 import static java.nio.ByteBuffer.allocateDirect;
@@ -97,15 +98,13 @@ public class ExampleGLObject {
                     convertedSquare.get(3)
             );
 
-            Point3D point1 = new Point3D();
-            int intersects1 = Triangle.intersectRayAndTriangle(ray, t1, point1);
-            Point3D point2 = new Point3D();
-            int intersects2 = Triangle.intersectRayAndTriangle(ray, t2, point2);
+            Intersection intersects1 = Triangle.intersectRayAndTriangle(ray, t1);
+            Intersection intersects2 = Triangle.intersectRayAndTriangle(ray, t2);
 
-            if (intersects1 == 1 || intersects1 == 2) {
-                Log.d("test", "touch!: " + name+" "+point1.toString());
-            } else if (intersects2 == 1 || intersects2 == 2) {
-                Log.d("test", "touch!: " + name+" "+point2.toString());
+            if (intersects1.isIntersect()) {
+                Log.d("test", "touch!: " + name+" "+intersects1.toString());
+            } else if (intersects2.isIntersect()) {
+                Log.d("test", "touch!: " + name+" "+intersects2.toString());
             }
         }
 
