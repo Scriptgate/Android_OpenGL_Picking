@@ -105,7 +105,6 @@ public class ExampleGLObject {
 		gl.glColor4f(color[0], color[1], color[2], color[3]);
 
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		
 		gl.glFrontFace(GL10.GL_CW);
 
