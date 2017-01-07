@@ -76,7 +76,7 @@ public class ExampleGLObject {
                 inputVector[1] = vertices[i + 1];
                 inputVector[2] = vertices[i + 2];
                 inputVector[3] = 1;
-                Matrix.multiplyMV(resultVector, 0, matrixGrabber.mModelView, 0, inputVector, 0);
+                Matrix.multiplyMV(resultVector, 0, matrixGrabber.modelView, 0, inputVector, 0);
                 convertedSquare[i] = resultVector[0] / resultVector[3];
                 convertedSquare[i + 1] = resultVector[1] / resultVector[3];
                 convertedSquare[i + 2] = resultVector[2] / resultVector[3];
@@ -105,10 +105,9 @@ public class ExampleGLObject {
 
         gl.glColor4f(color.red, color.green, color.blue, color.alpha);
 
-        gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-
         gl.glFrontFace(GL10.GL_CW);
 
+        gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
         gl.glVertexPointer(3, GL10.GL_FLOAT, 0, verticesBuffer);
 
         gl.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES10.GL_UNSIGNED_SHORT, indicesBuffer);

@@ -75,12 +75,16 @@ public class Triangle {
         // get and test parametric coords
         float s, t;
         s = ((uv * wv) - (vv * wu)) / D;
-        if (s < 0.0f || s > 1.0f)        // I is outside T
+        if (s < 0.0f || s > 1.0f){
+            // I is outside T
             return 0;
+        }
         t = (uv * wu - uu * wv) / D;
-        if (t < 0.0f || (s + t) > 1.0f)  // I is outside T
+        if (t < 0.0f || (s + t) > 1.0f) {
+            // I is outside T
             return 0;
- 
+        }
+
         return 1;                      // I is in T
     }
 }

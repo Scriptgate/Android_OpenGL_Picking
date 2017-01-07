@@ -20,8 +20,8 @@ import javax.microedition.khronos.opengles.GL10;
 
 class MatrixGrabber {
     public MatrixGrabber() {
-        mModelView = new float[16];
-        mProjection = new float[16];
+        modelView = new float[16];
+        projection = new float[16];
     }
 
     /**
@@ -40,7 +40,7 @@ class MatrixGrabber {
      * @param gl
      */
     public void getCurrentModelView(GL10 gl) {
-        getMatrix(gl, GL10.GL_MODELVIEW, mModelView);
+        getMatrix(gl, GL10.GL_MODELVIEW, modelView);
     }
 
     /**
@@ -49,7 +49,7 @@ class MatrixGrabber {
      * @param gl
      */
     public void getCurrentProjection(GL10 gl) {
-        getMatrix(gl, GL10.GL_PROJECTION, mProjection);
+        getMatrix(gl, GL10.GL_PROJECTION, projection);
     }
 
     private void getMatrix(GL10 gl, int mode, float[] mat) {
@@ -58,6 +58,6 @@ class MatrixGrabber {
         gl2.getMatrix(mat, 0);
     }
 
-    public float[] mModelView;
-    public float[] mProjection;
+    public float[] modelView;
+    public float[] projection;
 }

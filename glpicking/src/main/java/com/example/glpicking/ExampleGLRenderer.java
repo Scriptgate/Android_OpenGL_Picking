@@ -67,7 +67,14 @@ public class ExampleGLRenderer implements Renderer {
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glLoadIdentity();
 
-		gl.glFrustumf(-ratio, ratio, -1, 1, 3, 27);
+        float left = -ratio;
+        float right = ratio;
+        float bottom = -1.0f;
+        float top = 1.0f;
+        float near = 3.0f;
+        float far = 27.0f;
+
+        gl.glFrustumf(left, right, bottom, top, near, far);
 		
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 
