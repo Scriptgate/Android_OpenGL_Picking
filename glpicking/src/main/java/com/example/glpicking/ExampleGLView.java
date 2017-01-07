@@ -29,7 +29,7 @@ class ExampleGLView extends GLSurfaceView {
     public ExampleGLView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        setEGLContextClientVersion(1);
+        setEGLContextClientVersion(2);
         triangleRenderer = new ExampleGLRenderer();
         setRenderer(triangleRenderer);
         setOnClickListener(new OnClickListener() {

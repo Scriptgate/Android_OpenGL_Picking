@@ -12,9 +12,7 @@ public class Ray {
     Point3D P0;
     Point3D P1;
 
-    public Ray(GL10 gl, int width, int height, float xTouch, float yTouch) {
-        MatrixGrabber matrixGrabber = new MatrixGrabber();
-        matrixGrabber.getCurrentState(gl);
+    public Ray(float[] modelMatrix, float[] viewMatrix, float[] projectionMatrix, float[] mvpMatrix, int width, int height, float xTouch, float yTouch) {
 
         int[] viewport = {0, 0, width, height};
 
@@ -29,10 +27,11 @@ public class Ray {
 //        Log.d(TAG, "projection view is =" + Arrays.toString( matrixGrabber.projection ));
 
         //Read more here: http://myweb.lmu.edu/dondi/share/cg/unproject-explained.pdf
+        Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
 
         Point3D nearCoords = new Point3D();
-        int result = GLU.gluUnProject(winX, winY, 1.0f, matrixGrabber.modelView, 0, matrixGrabber.projection, 0, viewport, 0, temp, 0);
-        Matrix.multiplyMV(temp2, 0, matrixGrabber.modelView, 0, temp, 0);
+        int result = GLU.gluUnProject(winX, winY, 1.0f, mvpMatrix, 0, projectionMatrix, 0, viewport, 0, temp, 0);
+        Matrix.multiplyMV(temp2, 0, mvpMatrix, 0, temp, 0);
         if (result == GL10.GL_TRUE) {
             nearCoords = new Point3D(
                     temp2[0] / temp2[3],
@@ -43,8 +42,8 @@ public class Ray {
         this.P1 = nearCoords;
 
         Point3D farCoords = new Point3D();
-        result = GLU.gluUnProject(winX, winY, 0, matrixGrabber.modelView, 0, matrixGrabber.projection, 0, viewport, 0, temp, 0);
-        Matrix.multiplyMV(temp2, 0, matrixGrabber.modelView, 0, temp, 0);
+        result = GLU.gluUnProject(winX, winY, 0, mvpMatrix, 0, projectionMatrix, 0, viewport, 0, temp, 0);
+        Matrix.multiplyMV(temp2, 0, mvpMatrix, 0, temp, 0);
         if (result == GL10.GL_TRUE) {
             farCoords = new Point3D(
                     temp2[0] / temp2[3],

@@ -1,29 +1,27 @@
 package com.example.glpicking;
 
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.microedition.khronos.opengles.GL10;
-
-import android.opengl.GLES10;
-import android.opengl.GLES20;
-import android.opengl.GLU;
 import android.opengl.Matrix;
 import android.util.Log;
 
 import com.example.glpicking.common.Color;
 import com.example.glpicking.common.Intersection;
 import com.example.glpicking.common.Point3D;
+import com.example.glpicking.program.AttributeVariable;
+import com.example.glpicking.program.Program;
 
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.opengl.GLES20.*;
+import static com.example.glpicking.program.UniformVariable.MVP_MATRIX;
 import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.ByteOrder.nativeOrder;
 
 public class ExampleGLObject {
+
     private FloatBuffer verticesBuffer;
-    private short[] indices;
-    private ShortBuffer indicesBuffer;
+    private List<Point3D> points;
     private float vertices[];
 
     private String name;
@@ -37,49 +35,42 @@ public class ExampleGLObject {
         this.color = color;
         this.position = position;
 
-        vertices = new float[]{
-                -0.5f, 0.5f, 0.0f,   // top left
-                -0.5f, -0.5f, 0.0f,   // bottom left
-                0.5f, -0.5f, 0.0f,   // bottom right
-                0.5f, 0.5f, 0.0f  // top right
-        };
+        points = new ArrayList<>();
+        points.add(new Point3D(-0.5f, 0.5f, 0.0f));// top left
+        points.add(new Point3D(0.5f, 0.5f, 0.0f));// top right
+        points.add(new Point3D(-0.5f, -0.5f, 0.0f));// bottom left
+        points.add(new Point3D(0.5f, -0.5f, 0.0f));// bottom right
 
-        indices = new short[]{0, 1, 2, 0, 2, 3};
+        vertices = new float[]{
+                points.get(0).x, points.get(0).y, points.get(0).z,
+                points.get(2).x, points.get(2).y, points.get(2).z,
+                points.get(1).x, points.get(1).y, points.get(1).z,
+                points.get(2).x, points.get(2).y, points.get(2).z,
+                points.get(3).x, points.get(3).y, points.get(3).z,
+                points.get(1).x, points.get(1).y, points.get(1).z
+        };
 
         verticesBuffer = allocateDirect(vertices.length * 4).order(nativeOrder()).asFloatBuffer();
         verticesBuffer.put(vertices).position(0);
-
-        indicesBuffer = allocateDirect(indices.length * 2).order(nativeOrder()).asShortBuffer();
-        indicesBuffer.put(indices).position(0);
     }
 
-    public void draw(GL10 gl, Ray ray) {
-        gl.glLoadIdentity();
-
-        Point3D eye = new Point3D(0.0f, 0.0f, 5.0f);
-        Point3D center = new Point3D(0.0f, 0.0f, 0.0f);
-        Point3D up = new Point3D(0.0f, 1.0f, 0.0f);
-
-        GLU.gluLookAt(gl, eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x, up.y, up.z);
-
-        gl.glTranslatef(position.x, position.y, position.z);
+    public void draw(Ray ray, Program program, float[] modelMatrix, float[] viewMatrix, float[] projectionMatrix, float[] mvpMatrix) {
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.translateM(modelMatrix, 0, position.x, position.y, position.z);
+        Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
 
         if (ray != null) {
 
-            MatrixGrabber matrixGrabber = new MatrixGrabber();
-            matrixGrabber.getCurrentState(gl);
-
-            int coordCount = vertices.length;
             List<Point3D> convertedSquare = new ArrayList<>();
             float[] resultVector = new float[4];
             float[] inputVector = new float[4];
 
-            for (int i = 0; i < coordCount; i = i + 3) {
-                inputVector[0] = vertices[i];
-                inputVector[1] = vertices[i + 1];
-                inputVector[2] = vertices[i + 2];
+            for (int i = 0; i < points.size(); i++) {
+                inputVector[0] = points.get(i).x;
+                inputVector[1] = points.get(i).y;
+                inputVector[2] = points.get(i).z;
                 inputVector[3] = 1;
-                Matrix.multiplyMV(resultVector, 0, matrixGrabber.modelView, 0, inputVector, 0);
+                Matrix.multiplyMV(resultVector, 0, mvpMatrix, 0, inputVector, 0);
                 convertedSquare.add(new Point3D(
                         resultVector[0] / resultVector[3],
                         resultVector[1] / resultVector[3],
@@ -89,13 +80,13 @@ public class ExampleGLObject {
 
             Triangle t1 = new Triangle(
                     convertedSquare.get(0),
-                    convertedSquare.get(1),
-                    convertedSquare.get(2)
+                    convertedSquare.get(2),
+                    convertedSquare.get(3)
             );
             Triangle t2 = new Triangle(
                     convertedSquare.get(0),
-                    convertedSquare.get(2),
-                    convertedSquare.get(3)
+                    convertedSquare.get(3),
+                    convertedSquare.get(1)
             );
 
             Intersection intersects1 = Triangle.intersectRayAndTriangle(ray, t1);
@@ -108,13 +99,18 @@ public class ExampleGLObject {
             }
         }
 
-        gl.glColor4f(color.red, color.green, color.blue, color.alpha);
+        int colorHandle = program.getHandle(AttributeVariable.COLOR);
+        glDisableVertexAttribArray(colorHandle);
+        glVertexAttrib4fv(colorHandle, color.toArray(), 0);
 
-        gl.glFrontFace(GL10.GL_CW);
+        int positionHandle = program.getHandle(AttributeVariable.POSITION);
+        verticesBuffer.position(0);
+        glVertexAttribPointer(positionHandle, 3, GL_FLOAT, false, 0, verticesBuffer);
+        glEnableVertexAttribArray(positionHandle);
 
-        gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, verticesBuffer);
+        Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
+        glUniformMatrix4fv(program.getHandle(MVP_MATRIX), 1, false, mvpMatrix, 0);
 
-        gl.glDrawElements(GLES20.GL_TRIANGLES, indices.length, GLES10.GL_UNSIGNED_SHORT, indicesBuffer);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 }
