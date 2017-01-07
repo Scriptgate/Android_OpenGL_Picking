@@ -12,10 +12,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        
-        setContentView(R.layout.main); 
-        view = (ExampleGLView)findViewById(R.id.glView);
-        
+
+        setContentView(R.layout.main);
+        view = (ExampleGLView) findViewById(R.id.glView);
+
         view.setGLWrapper(new GLSurfaceView.GLWrapper() {
             public GL wrap(GL gl) {
                 return new MatrixTrackingGL(gl);
