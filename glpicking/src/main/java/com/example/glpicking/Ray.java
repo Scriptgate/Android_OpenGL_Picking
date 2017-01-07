@@ -5,10 +5,12 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLU;
 import android.opengl.Matrix;
 
+import com.example.glpicking.common.Point3D;
+
 public class Ray {
 
-    float[] P0;
-    float[] P1;
+    Point3D P0;
+    Point3D P1;
 
     public Ray(GL10 gl, int width, int height, float xTouch, float yTouch) {
         MatrixGrabber matrixGrabber = new MatrixGrabber();
@@ -16,8 +18,8 @@ public class Ray {
 
         int[] viewport = {0, 0, width, height};
 
-        float[] nearCoOrds = new float[3];
-        float[] farCoOrds = new float[3];
+        Point3D nearCoOrds = new Point3D();
+        Point3D farCoOrds = new Point3D();
         float[] temp = new float[4];
         float[] temp2 = new float[4];
         // get the near and far ords for the click
@@ -32,18 +34,20 @@ public class Ray {
         int result = GLU.gluUnProject(winX, winY, 1.0f, matrixGrabber.modelView, 0, matrixGrabber.projection, 0, viewport, 0, temp, 0);
         Matrix.multiplyMV(temp2, 0, matrixGrabber.modelView, 0, temp, 0);
         if (result == GL10.GL_TRUE) {
-            nearCoOrds[0] = temp2[0] / temp2[3];
-            nearCoOrds[1] = temp2[1] / temp2[3];
-            nearCoOrds[2] = temp2[2] / temp2[3];
+            nearCoOrds = new Point3D(
+                    temp2[0] / temp2[3],
+                    temp2[1] / temp2[3],
+                    temp2[2] / temp2[3]);
 
         }
 
         result = GLU.gluUnProject(winX, winY, 0, matrixGrabber.modelView, 0, matrixGrabber.projection, 0, viewport, 0, temp, 0);
         Matrix.multiplyMV(temp2, 0, matrixGrabber.modelView, 0, temp, 0);
         if (result == GL10.GL_TRUE) {
-            farCoOrds[0] = temp2[0] / temp2[3];
-            farCoOrds[1] = temp2[1] / temp2[3];
-            farCoOrds[2] = temp2[2] / temp2[3];
+            farCoOrds = new Point3D(
+                    temp2[0] / temp2[3],
+                    temp2[1] / temp2[3],
+                    temp2[2] / temp2[3]);
         }
         this.P0 = farCoOrds;
         this.P1 = nearCoOrds;

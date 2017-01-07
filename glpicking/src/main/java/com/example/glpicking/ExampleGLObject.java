@@ -87,25 +87,25 @@ public class ExampleGLObject {
             }
 
             Triangle t1 = new Triangle(
-                    convertedSquare.get(0).toArray(),
-                    convertedSquare.get(1).toArray(),
-                    convertedSquare.get(2).toArray()
+                    convertedSquare.get(0),
+                    convertedSquare.get(1),
+                    convertedSquare.get(2)
             );
             Triangle t2 = new Triangle(
-                    convertedSquare.get(0).toArray(),
-                    convertedSquare.get(2).toArray(),
-                    convertedSquare.get(3).toArray()
+                    convertedSquare.get(0),
+                    convertedSquare.get(2),
+                    convertedSquare.get(3)
             );
 
-            float[] point1 = new float[3];
+            Point3D point1 = new Point3D();
             int intersects1 = Triangle.intersectRayAndTriangle(ray, t1, point1);
-            float[] point2 = new float[3];
+            Point3D point2 = new Point3D();
             int intersects2 = Triangle.intersectRayAndTriangle(ray, t2, point2);
 
             if (intersects1 == 1 || intersects1 == 2) {
-                Log.d("test", "touch!: " + name);
+                Log.d("test", "touch!: " + name+" "+point1.toString());
             } else if (intersects2 == 1 || intersects2 == 2) {
-                Log.d("test", "touch!: " + name);
+                Log.d("test", "touch!: " + name+" "+point2.toString());
             }
         }
 
