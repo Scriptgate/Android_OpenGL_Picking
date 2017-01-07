@@ -8,6 +8,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.opengl.GLSurfaceView.Renderer;
 
+import com.example.glpicking.common.Point2D;
 import com.example.glpicking.common.Point3D;
 
 import static com.example.glpicking.common.Color.*;
@@ -21,8 +22,7 @@ public class ExampleGLRenderer implements Renderer {
     private int width;
     private int height;
 
-    private int pressX = -99;
-    private int pressY = -99;
+    private Point2D press = null;
 
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         gl.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -46,14 +46,14 @@ public class ExampleGLRenderer implements Renderer {
         gl.glMatrixMode(GL10.GL_MODELVIEW);
 
         Ray ray = null;
-        if (pressX != -99) {
-            ray = new Ray(gl, width, height, pressX, pressY);
+        if (press != null) {
+            ray = new Ray(gl, width, height, press.x, press.y);
         }
 
         for (ExampleGLObject slide : slides) {
             slide.draw(gl, ray);
         }
-        pressX = -99;
+        press = null;
     }
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -82,7 +82,6 @@ public class ExampleGLRenderer implements Renderer {
     }
 
     public void onPress(int x, int y) {
-        pressX = x;
-        pressY = y;
+        press = new Point2D(x, y);
     }
 }
