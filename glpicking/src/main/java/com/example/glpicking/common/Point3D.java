@@ -41,9 +41,9 @@ public class Point3D {
 
     public static Point3D crossProduct(Point3D u, Point3D v) {
         return new Point3D(
-                (u.y * v.z) - (u.z * v.y),
-                (u.z * v.x) - (u.x * v.z),
-                (u.x * v.y) - (u.y * v.x)
+                (u.y * v.z) - (v.y * u.z),
+                (v.x * u.z) - (u.x * v.z),
+                (u.x * v.y) - (v.x * u.y)
         );
     }
 
