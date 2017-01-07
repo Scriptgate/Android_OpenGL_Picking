@@ -2,6 +2,8 @@ package com.example.glpicking;
 
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -67,7 +69,7 @@ public class ExampleGLObject {
             matrixGrabber.getCurrentState(gl);
 
             int coordCount = vertices.length;
-            float[] convertedSquare = new float[coordCount];
+            List<Point3D> convertedSquare = new ArrayList<>();
             float[] resultVector = new float[4];
             float[] inputVector = new float[4];
 
@@ -77,19 +79,23 @@ public class ExampleGLObject {
                 inputVector[2] = vertices[i + 2];
                 inputVector[3] = 1;
                 Matrix.multiplyMV(resultVector, 0, matrixGrabber.modelView, 0, inputVector, 0);
-                convertedSquare[i] = resultVector[0] / resultVector[3];
-                convertedSquare[i + 1] = resultVector[1] / resultVector[3];
-                convertedSquare[i + 2] = resultVector[2] / resultVector[3];
+                convertedSquare.add(new Point3D(
+                        resultVector[0] / resultVector[3],
+                        resultVector[1] / resultVector[3],
+                        resultVector[2] / resultVector[3])
+                );
             }
 
             Triangle t1 = new Triangle(
-                    new float[]{convertedSquare[0], convertedSquare[1], convertedSquare[2]},
-                    new float[]{convertedSquare[3], convertedSquare[4], convertedSquare[5]},
-                    new float[]{convertedSquare[6], convertedSquare[7], convertedSquare[8]});
+                    convertedSquare.get(0).toArray(),
+                    convertedSquare.get(1).toArray(),
+                    convertedSquare.get(2).toArray()
+            );
             Triangle t2 = new Triangle(
-                    new float[]{convertedSquare[0], convertedSquare[1], convertedSquare[2]},
-                    new float[]{convertedSquare[6], convertedSquare[7], convertedSquare[8]},
-                    new float[]{convertedSquare[9], convertedSquare[10], convertedSquare[11]});
+                    convertedSquare.get(0).toArray(),
+                    convertedSquare.get(2).toArray(),
+                    convertedSquare.get(3).toArray()
+            );
 
             float[] point1 = new float[3];
             int intersects1 = Triangle.intersectRayAndTriangle(ray, t1, point1);

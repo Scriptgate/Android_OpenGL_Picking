@@ -15,4 +15,8 @@ public class Point3D {
         this.y = y;
         this.z = z;
     }
+
+    public float[] toArray() {
+        return new float[]{x, y, z};
+    }
 }
