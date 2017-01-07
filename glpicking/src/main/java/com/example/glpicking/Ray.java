@@ -23,9 +23,6 @@ public class Ray {
         float winX = xTouch;
         float winY = (float) viewport[3] - yTouch;
 
-//        Log.d(TAG, "modelView is =" + Arrays.toString(matrixGrabber.modelView));
-//        Log.d(TAG, "projection view is =" + Arrays.toString( matrixGrabber.projection ));
-
         //Read more here: http://myweb.lmu.edu/dondi/share/cg/unproject-explained.pdf
         Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
 

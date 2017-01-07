@@ -1,7 +1,6 @@
 package com.example.glpicking;
 
 import android.opengl.Matrix;
-import android.util.Log;
 
 import com.example.glpicking.common.Color;
 import com.example.glpicking.common.Intersection;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.opengl.GLES20.*;
+import static com.example.glpicking.common.Color.MAGENTA;
 import static com.example.glpicking.program.UniformVariable.MVP_MATRIX;
 import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.ByteOrder.nativeOrder;
@@ -24,13 +24,12 @@ public class ExampleGLObject {
     private List<Point3D> points;
     private float vertices[];
 
-    private String name;
+    private boolean selected = false;
 
     private Color color;
     private Point3D position;
 
-    public ExampleGLObject(String name, Color color, Point3D position) {
-        this.name = name;
+    public ExampleGLObject(Color color, Point3D position) {
 
         this.color = color;
         this.position = position;
@@ -92,16 +91,16 @@ public class ExampleGLObject {
             Intersection intersects1 = Triangle.intersectRayAndTriangle(ray, t1);
             Intersection intersects2 = Triangle.intersectRayAndTriangle(ray, t2);
 
-            if (intersects1.isIntersect()) {
-                Log.d("test", "touch!: " + name+" "+intersects1.toString());
-            } else if (intersects2.isIntersect()) {
-                Log.d("test", "touch!: " + name+" "+intersects2.toString());
-            }
+            selected = intersects1.isIntersect() || intersects2.isIntersect();
         }
 
         int colorHandle = program.getHandle(AttributeVariable.COLOR);
         glDisableVertexAttribArray(colorHandle);
-        glVertexAttrib4fv(colorHandle, color.toArray(), 0);
+        if (selected) {
+            glVertexAttrib4fv(colorHandle, MAGENTA.toArray(), 0);
+        } else {
+            glVertexAttrib4fv(colorHandle, color.toArray(), 0);
+        }
 
         int positionHandle = program.getHandle(AttributeVariable.POSITION);
         verticesBuffer.position(0);

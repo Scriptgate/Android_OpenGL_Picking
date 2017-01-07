@@ -52,10 +52,10 @@ public class ExampleGLRenderer implements Renderer {
         program = createProgram("color_vertex_shader", "color_fragment_shader", asList(POSITION, COLOR));
 
         //add 4 test objects to the scene
-        slides.add(new ExampleGLObject("red", RED, new Point3D(0.0f, 0.0f, 0.5f)));
-        slides.add(new ExampleGLObject("yellow", YELLOW, new Point3D(0.5f, 0.5f, 1.0f)));
-        slides.add(new ExampleGLObject("green", GREEN, new Point3D(-1.2f, 0.0f, 0.0f)));
-        slides.add(new ExampleGLObject("blue", BLUE, new Point3D(0.5f, -1.0f, 0.0f)));
+        slides.add(new ExampleGLObject(RED, new Point3D(0.0f, 0.0f, 0.5f)));
+        slides.add(new ExampleGLObject(YELLOW, new Point3D(0.5f, 0.5f, 1.0f)));
+        slides.add(new ExampleGLObject(GREEN, new Point3D(-1.2f, 0.0f, 0.0f)));
+        slides.add(new ExampleGLObject(BLUE, new Point3D(0.5f, -1.0f, 0.0f)));
     }
 
     public void onDrawFrame(GL10 gl) {

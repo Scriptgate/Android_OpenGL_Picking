@@ -1,9 +1,6 @@
 package com.example.glpicking;
 
-import javax.microedition.khronos.opengles.GL;
-
 import android.app.Activity;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 
 public class MainActivity extends Activity {
@@ -15,12 +12,6 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.main);
         view = (ExampleGLView) findViewById(R.id.glView);
-
-        view.setGLWrapper(new GLSurfaceView.GLWrapper() {
-            public GL wrap(GL gl) {
-                return new MatrixTrackingGL(gl);
-            }
-        });
     }
 
     @Override
