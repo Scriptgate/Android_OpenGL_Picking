@@ -9,6 +9,9 @@ import com.example.glpicking.common.Point3D;
 
 public class Ray {
 
+    private static final float NEAR = 1.0f;
+    private static final float FAR = 0.0f;
+
     Point3D P0;
     Point3D P1;
 
@@ -16,37 +19,28 @@ public class Ray {
 
         int[] viewport = {0, 0, width, height};
 
-        float[] temp = new float[4];
-        float[] temp2 = new float[4];
-        // get the near and far ords for the click
-
         float winX = xTouch;
         float winY = (float) viewport[3] - yTouch;
 
         //Read more here: http://myweb.lmu.edu/dondi/share/cg/unproject-explained.pdf
         Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
 
-        Point3D nearCoords = new Point3D();
-        int result = GLU.gluUnProject(winX, winY, 1.0f, mvpMatrix, 0, projectionMatrix, 0, viewport, 0, temp, 0);
-        Matrix.multiplyMV(temp2, 0, mvpMatrix, 0, temp, 0);
-        if (result == GL10.GL_TRUE) {
-            nearCoords = new Point3D(
-                    temp2[0] / temp2[3],
-                    temp2[1] / temp2[3],
-                    temp2[2] / temp2[3]);
+        this.P0 = screenCoordinatesToViewCoordinates(winX, winY, FAR, mvpMatrix, projectionMatrix, viewport);
+        this.P1 = screenCoordinatesToViewCoordinates(winX, winY, NEAR, mvpMatrix, projectionMatrix, viewport);
+    }
 
-        }
-        this.P1 = nearCoords;
+    private Point3D screenCoordinatesToViewCoordinates(float winX, float winY, float winZ, float[] mvMatrix, float[] projectionMatrix, int[] viewport) {
+        float[] temp = new float[4];
+        Point3D farCoordinates = new Point3D();
 
-        Point3D farCoords = new Point3D();
-        result = GLU.gluUnProject(winX, winY, 0, mvpMatrix, 0, projectionMatrix, 0, viewport, 0, temp, 0);
-        Matrix.multiplyMV(temp2, 0, mvpMatrix, 0, temp, 0);
+        int result = GLU.gluUnProject(winX, winY, winZ, mvMatrix, 0, projectionMatrix, 0, viewport, 0, temp, 0);
+        Matrix.multiplyMV(temp, 0, mvMatrix, 0, temp, 0);
         if (result == GL10.GL_TRUE) {
-            farCoords = new Point3D(
-                    temp2[0] / temp2[3],
-                    temp2[1] / temp2[3],
-                    temp2[2] / temp2[3]);
+            farCoordinates = new Point3D(
+                    temp[0] / temp[3],
+                    temp[1] / temp[3],
+                    temp[2] / temp[3]);
         }
-        this.P0 = farCoords;
+        return farCoordinates;
     }
 }

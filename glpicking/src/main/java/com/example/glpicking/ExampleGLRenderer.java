@@ -65,12 +65,12 @@ public class ExampleGLRenderer implements Renderer {
         Ray ray = null;
         if (press != null) {
             ray = new Ray(modelMatrix, viewMatrix, projectionMatrix, mvpMatrix, width, height, press.x, press.y);
+            press = null;
         }
 
         for (ExampleGLObject slide : slides) {
             slide.draw(ray, program, modelMatrix, viewMatrix, projectionMatrix, mvpMatrix);
         }
-        press = null;
     }
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
